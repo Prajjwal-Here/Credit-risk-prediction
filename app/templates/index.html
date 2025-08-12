@@ -1,0 +1,222 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Default Prediction</title>
+
+    <!-- Internal CSS for styling -->
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1E2A47;  /* Dark Blue Background */
+            color: #F4F5F7;  /* Light Gray Text */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Heading styling */
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #FFFFFF;
+            font-size: 34px;
+            font-weight: 600;
+        }
+
+        /* Form container styling */
+        form {
+            background-color: #28334AFF;  /* Darker Charcoal */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 450px;
+            transition: all 0.3s ease;
+        }
+
+        /* Input field and labels styling */
+        label {
+            font-size: 16px;
+            color: #BDC3C7;
+            margin-top: 15px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #7F8C8D;  /* Lighter border color */
+            border-radius: 8px;
+            background-color: #34495E;  /* Slightly lighter input background */
+            color: #EAEAEA;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: #2980B9;  /* Blue border on focus */
+            background-color: #2C3E50;  /* Darker background on focus */
+        }
+
+        /* Submit button styling */
+        input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #2980B9;  /* Blue button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1A5276;  /* Darker blue on hover */
+        }
+
+        /* Prediction result styling */
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #E74C3C;  /* Red for the result */
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            color: #BDC3C7;
+        }
+
+        footer a {
+            color: #2980B9;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Light mode toggle button styling */
+        .toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        .toggle-btn {
+            background-color: #2980B9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Button hover effect */
+        .toggle-btn:hover {
+            background-color: #1A5276;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dark Mode Toggle Button -->
+    <div class="toggle-container">
+        <button class="toggle-btn" onclick="toggleDarkMode()">Switch to Light Mode</button>
+    </div>
+
+    <div>
+        <h2>Loan Default Prediction</h2>
+        
+        <form method="POST" action="/predict">
+            <!-- Age Input -->
+            <label for="person_age">What is your **age** (in years)?</label>
+            <input type="text" name="person_age" placeholder="Enter your age" required><br>
+            
+            <!-- Income Input -->
+            <label for="person_income">What is your **annual income** (in USD)?</label>
+            <input type="text" name="person_income" placeholder="Enter your annual income" required><br>
+            
+            <!-- Loan Amount Input -->
+            <label for="loan_amnt">What is the **loan amount** (in USD) you are applying for?</label>
+            <input type="text" name="loan_amnt" placeholder="Enter loan amount" required><br>
+
+            <!-- Loan Interest Rate Input -->
+            <label for="loan_int_rate">What is the **loan interest rate** (%)?</label>
+            <input type="text" name="loan_int_rate" placeholder="Enter loan interest rate" required><br>
+
+            <!-- Home Ownership Input (New Feature) -->
+            <label for="person_home_ownership">What is your **home ownership status**?</label>
+            <select name="person_home_ownership" required>
+                <option value="OWN">Own</option>
+                <option value="MORTGAGE">Mortgage</option>
+                <option value="RENT">Rent</option>
+            </select><br>
+
+            <!-- Loan Grade Input (New Feature) -->
+            <label for="loan_grade">What is the **loan grade**?</label>
+            <select name="loan_grade" required>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+            </select><br>
+
+            <!-- Add More Features as Needed -->
+            <!-- You can add more input fields depending on the 23 features your model expects -->
+
+            <input type="submit" value="Predict">
+        </form>
+        
+        <!-- Display Prediction Result -->
+        <div class="result">
+            <h3>{{ prediction_text }}</h3>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Credit Risk Prediction. All rights reserved.</p>
+        <p>Powered by <a href="https://www.example.com">Your Bank</a></p>
+    </footer>
+
+    <!-- JavaScript for Dark Mode Toggle -->
+    <script>
+        function toggleDarkMode() {
+            const body = document.body;
+            const button = document.querySelector('.toggle-btn');
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                button.innerHTML = 'Switch to Dark Mode';
+                body.style.backgroundColor = '#F4F5F7';  // Light background for light mode
+                body.style.color = '#2C3E50';  // Dark text for light mode
+                document.querySelector('form').style.backgroundColor = '#FFFFFF';  // Light form background
+                document.querySelector('form').style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';  // Lighter shadow
+            } else {
+                button.innerHTML = 'Switch to Light Mode';
+                body.style.backgroundColor = '#121212';  // Dark background for dark mode
+                body.style.color = '#EAEAEA';  // Light text for dark mode
+                document.querySelector('form').style.backgroundColor = '#28334AFF';  // Dark form background
+                document.querySelector('form').style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.6)';  // Darker shadow
+            }
+        }
+    </script>
+
+</body>
+</html>
